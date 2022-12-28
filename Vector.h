@@ -10,20 +10,23 @@ namespace zzstl {
 	template <typename T>
 	class Vector {
 	public:
-		Vector(size_t size = 2) : m_Size(0), m_Capacity(size) {
-			ReAlloc(m_Capacity);
+		Vector(size_t size = 2) {
+			ReAlloc(size);
 		}
 
-		Vector(size_t size, const T& val) : m_Size(size), m_Capacity(size) {
-			ReAlloc(m_Capacity);
-			fill(m_Data, size, val);
+		Vector(size_t size, const T& val) {
+			ReAlloc(size);
+			m_Size = size;
+			Fill(m_Data, size, val);
 		}
 
-		Vector(const Vector& rhs) : m_Size(rhs.Size()), m_Capacity(rhs.Capacity()) {
+		Vector(const Vector& rhs) {
 			ReAlloc(m_Capacity);
+			m_Size = rhs.Size();
 			for (size_t i = 0; i < m_Size; ++i) m_Data[i] = rhs[i];
 		}
 
+		//FIX ME!!
 		Vector(Vector&& rhs) : m_Size(rhs.Size()), m_Capacity(rhs.Capacity()) {
 			m_Data = rhs.Data();
 			rhs.Data() = nullptr;
@@ -32,11 +35,11 @@ namespace zzstl {
 		}
 
 		~Vector() {
-			for (size_t i = 0; i < m_Size; ++i) {
-				m_Data[i].~T();
-			}
+			Clear();
+			::operator delete(m_Data, m_Capacity * sizeof(T));
 		}
 
+	public:
 		T& operator[] (size_t pos)  {
 			assert(m_Size > pos, "Index out of bounds");
 
@@ -61,7 +64,6 @@ namespace zzstl {
 			if (m_Size == m_Capacity) ReAlloc(m_Capacity + m_Capacity / 2);
 			
 			assert(m_Data != nullptr);
-			//m_Data[m_Size] = val;
 			new (&m_Data[m_Size]) T(val);
 			++m_Size;
 		}
@@ -88,9 +90,20 @@ namespace zzstl {
 			++m_Size;
 		}
 
-		void Resize(size_t newCapacity) {
-			ReAlloc(newCapacity);
-			m_Size = newCapacity;
+		void ShrinkToFit() {
+			if (m_Size == m_Capacity) return;
+			ReAlloc(m_Size);
+		}
+
+		void Resize(size_t NewSize) {
+			if (NewSize < m_Size) {
+				for (size_t i = NewSize; i < m_Size; ++i) m_Data[i].~T();
+			}
+			else {
+				ReAlloc(NewSize);
+				Fill_InPlace(&m_Data[m_Size], NewSize - m_Size);
+			}
+			m_Size = NewSize;
 		}
 
 		void Clear() {
@@ -100,32 +113,26 @@ namespace zzstl {
 
 	private:
 		void ReAlloc(size_t NewCapacity) {
-#if DEBUG
-			assert(m_Size <= NewCapacity, "Possible loss of data");
-#endif
-
 			T* NewBlock = (T*) ::operator new(NewCapacity * sizeof(T));
-			//T* NewBlock = new T[NewCapacity];
 
-			//assert(m_Data != nullptr);
-			size_t size = m_Size < NewCapacity ? m_Size : NewCapacity;
+			size_t size = Min(m_Size, NewCapacity);
 			for (size_t i = 0; i < size; ++i) new (&NewBlock[i]) T(std::move(m_Data[i]));
 
-		//	::operator delete(m_Data, m_Capacity * sizeof(T));
 			for (size_t i = 0; i < m_Size; ++i) m_Data[i].~T();
-			m_Data = NewBlock;
+			::operator delete(m_Data, m_Capacity * sizeof(T));
 
+			m_Data = NewBlock;
 			m_Capacity = NewCapacity;
 		}
 
 	private:
-		size_t m_Size;
-		size_t m_Capacity;
-		T* m_Data = nullptr;
+		size_t m_Size = 0;
+		size_t m_Capacity = 0;
+		T* m_Data;
 	};
 
 	template<typename T>
-	std::ostream& operator<<(std::ostream& os, zzstl::Vector<T>& vector) {
+	std::ostream& operator<<(std::ostream& os, const Vector<T>& vector) {
 		std::cout << "-------------------------\n";
 		std::cout << vector.Size() << " | " << vector.Capacity() << std::endl;
 		for (size_t i = 0; i < vector.Size(); ++i) os << vector[i] << " | ";
