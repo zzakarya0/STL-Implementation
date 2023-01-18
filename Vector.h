@@ -9,12 +9,39 @@
 namespace zzstl 
 {
 	template <typename T>
+	class Iterator 
+	{
+	public:
+		constexpr Iterator(T* Data) noexcept : m_ptr(Data) {}
+		constexpr Iterator(const Iterator& rhs) noexcept : m_ptr(rhs.m_ptr) {}
+
+		constexpr Iterator operator++() noexcept
+		{
+			++m_ptr;
+			return *this;
+		}
+
+		constexpr Iterator operator++(int) noexcept
+		{
+			Iterator temp(*this);
+			++m_ptr;
+			return temp;
+		}
+
+		constexpr bool operator!=(const Iterator& rhs) noexcept { return m_ptr != rhs.m_ptr; }
+		constexpr T operator*() noexcept { return *m_ptr; }
+
+	private:
+		T* m_ptr;
+	};
+
+	template <typename T>
 	class Vector 
 	{
 	public: // public constructors offered by the vector class
 
 		/// Vector default constructor
-		Vector() noexcept : m_Size(0), m_Capacity(0), m_Data(nullptr) {} 
+		constexpr Vector() noexcept : m_Size(0), m_Capacity(0), m_Data(nullptr) {} 
 		
 		/// Constructor taking the size/capacity of container and intiallizing with default value 
 		explicit Vector(size_t size) {
@@ -97,39 +124,43 @@ namespace zzstl
 		constexpr inline T* Data() noexcept { return m_Data; }
 		constexpr inline const T* Data() const noexcept { return m_Data; }
 
+		constexpr Iterator<T> begin() noexcept { return Iterator<T>(m_Data); }
+		constexpr Iterator<T> end() noexcept { return Iterator<T>(m_Data + m_Size); }
+
+
 		constexpr T& Front()
 		{
-			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
 		constexpr const T& Front() const 
 		{
-			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
 		constexpr T& Back()
 		{
-			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
 		constexpr const T& Back() const
 		{
-			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
 		constexpr T& operator[] (size_t pos)  
 		{
-			static_assert(m_Size > pos, "Index out of bounds");
+			assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
 		constexpr const T& operator[] (size_t pos) const 
 		{
-			static_assert(m_Size > pos, "Index out of bounds");
+			assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 

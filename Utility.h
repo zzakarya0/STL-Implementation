@@ -27,12 +27,12 @@ namespace zzstl {
 	}
 
 	template <typename T>
-	inline const T& Min(const T& val1, const T& val2) {
+	constexpr inline const T& Min(const T& val1, const T& val2) noexcept {
 		return val1 < val2 ? val1 : val2;
 	}
 
 	template <typename T>
-	inline const T& Max(const T& val1, const T& val2) {
+	constexpr inline const T& Max(const T& val1, const T& val2) noexcept {
 		return val1 > val2 ? val1 : val2;
 	}
 }
