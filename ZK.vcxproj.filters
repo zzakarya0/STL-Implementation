@@ -13,16 +13,22 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{b4ffcdd5-e0aa-4bbe-8c38-4d8f285439a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility.h">
+    <ClInclude Include="Iterators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vector.h">
-      <Filter>Header Files</Filter>
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Array.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

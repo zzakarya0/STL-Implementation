@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Iterators.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
