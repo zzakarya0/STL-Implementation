@@ -86,50 +86,50 @@ namespace zzstl
 	public: // Public member functions offered by the class
 
 		//	Returns current number of elements in the container
-		inline size_t Size() const noexcept { return m_Size; }
+		constexpr inline size_t Size() const noexcept { return m_Size; }
 
 		//	Returns number of elements the container can take before a re-allocation
-		inline size_t Capacity() const  noexcept { return m_Capacity; }
+		constexpr inline size_t Capacity() const  noexcept { return m_Capacity; }
 
-		inline bool Empty() const noexcept { return m_Size == 0; }
+		constexpr inline bool Empty() const noexcept { return m_Size == 0; }
 
 		//	Pointer to internal data array
-		inline T* Data() noexcept { return m_Data; }
-		inline const T* Data() const noexcept { return m_Data; }
+		constexpr inline T* Data() noexcept { return m_Data; }
+		constexpr inline const T* Data() const noexcept { return m_Data; }
 
-		T& Front()
+		constexpr T& Front()
 		{
-			assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
-		const T& Front() const 
+		constexpr const T& Front() const 
 		{
-			assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
-		T& Back()
+		constexpr T& Back()
 		{
-			assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
-		const T& Back() const
+		constexpr const T& Back() const
 		{
-			assert(m_Size >= 0, "Cannot retrieve from empty vector");
+			static_assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
-		T& operator[] (size_t pos)  
+		constexpr T& operator[] (size_t pos)  
 		{
-			assert(m_Size > pos, "Index out of bounds");
+			static_assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
-		const T& operator[] (size_t pos) const 
+		constexpr const T& operator[] (size_t pos) const 
 		{
-			assert(m_Size > pos, "Index out of bounds");
+			static_assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
@@ -151,7 +151,7 @@ namespace zzstl
 
 		void PopBack() 
 		{
-			assert(m_Size != 0, "Cannot pop from an empty vector.");
+			static_assert(m_Size != 0, "Cannot pop from an empty vector.");
 			m_Data[--m_Size].~T();
 		}
 
