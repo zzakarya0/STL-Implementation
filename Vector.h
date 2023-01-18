@@ -77,7 +77,8 @@ namespace zzstl
 		}
 
 		// Vector destructor
-		~Vector() {
+		~Vector() 
+		{
 			Clear();
 			::operator delete(m_Data, m_Capacity * sizeof(T));
 		}
@@ -85,16 +86,16 @@ namespace zzstl
 	public: // Public member functions offered by the class
 
 		//	Returns current number of elements in the container
-		inline size_t Size() const { return m_Size; }
+		inline size_t Size() const noexcept { return m_Size; }
 
 		//	Returns number of elements the container can take before a re-allocation
-		inline size_t Capacity() const { return m_Capacity; }
+		inline size_t Capacity() const  noexcept { return m_Capacity; }
 
-		inline bool Empty() const { return m_Size == 0; }
+		inline bool Empty() const noexcept { return m_Size == 0; }
 
 		//	Pointer to internal data array
-		inline T* Data() { return m_Data; }
-		inline const T* Data() const { return m_Data; }
+		inline T* Data() noexcept { return m_Data; }
+		inline const T* Data() const noexcept { return m_Data; }
 
 		T& Front()
 		{
