@@ -166,7 +166,10 @@ namespace zzstl
 		void ShrinkToFit() 
 		{
 			if (m_Size == m_Capacity) return;
-			ReAlloc(m_Size);
+			
+			for (size_t i = m_Size; i < m_Capacity; ++i) (m_Data[i]).~T();
+			::operator delete(m_Data[m_Size], m_Capacity - m_Size);
+			m_Capacity = m_Size;
 		}
 
 		void Resize(size_t NewSize)
