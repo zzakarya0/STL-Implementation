@@ -39,6 +39,7 @@ struct Vector3 {
 	bool operator<(const Vector3& rhs) const {
 		return (_x + _y + _z) < (rhs._x + rhs._y + rhs._z);;
 	}
+	void f() {};
 };
 
 std::ostream& operator<<(std::ostream& os, const Vector3& v3)  {
@@ -47,22 +48,35 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v3)  {
 }
 
 int main() {
-	zzstl::Vector<int> v;
+	//zzstl::Vector<int> v;
 
-	v.PushBack(1);
-	v.PushBack(2);
-	v.PushBack(3);
-	v.PushBack(4);
-	v.PushBack(5);
-	v.PushBack(6);
-	v.PushBack(7);
-	v.PushBack(8);
-	v.PushBack(9);
-	v.PushBack(10);
-	std::cout << v;
+	//v.PushBack(1);
+	//v.PushBack(2);
+	//v.PushBack(3);
+	//v.PushBack(4);
+	//v.PushBack(5);
+	//v.PushBack(6);
+	//v.PushBack(7);
+	//v.PushBack(8);
+	//v.PushBack(9);
+	//v.PushBack(10);
+	//std::cout << v;
 
-	//for (zzstl::Iterator<int> it = v.begin(); it != v.end(); ++it) std::cout << *it << std::endl;
-	for (int i : v) std::cout << i << std::endl;
+	////for (zzstl::Iterator<int> it = v.begin(); it != v.end(); ++it) std::cout << *it << std::endl;
+	//for (int i : v) std::cout << i << std::endl;
+
+	std::vector<Vector3> v;
+	std::vector<Vector3>::iterator it = v.begin();
+	it->f();
+
+	zzstl::Vector<Vector3> v11;
+	zzstl::Vector<Vector3>::Iterator it11 = v11.begin();
+	(*it11).f();
+	it11->f();
+
+	Vector3 v3;
+	Vector3* pv3 = &v3;
+	pv3->f();
 
 	std::cin.get();
 }

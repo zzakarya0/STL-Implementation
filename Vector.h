@@ -8,36 +8,47 @@
 
 namespace zzstl 
 {
-	template <typename T>
-	class Iterator 
+	template <typename Vector>
+	class Vector_Iterator 
 	{
 	public:
-		constexpr Iterator(T* Data) noexcept : m_ptr(Data) {}
-		constexpr Iterator(const Iterator& rhs) noexcept : m_ptr(rhs.m_ptr) {}
+		using ValueType = typename Vector::ValueType;
+		using PType = ValueType*;
 
-		constexpr Iterator operator++() noexcept
+	public:
+		constexpr Vector_Iterator(PType Data) noexcept : m_ptr(Data) {}
+		constexpr Vector_Iterator(const Vector_Iterator& rhs) noexcept : m_ptr(rhs.m_ptr) {}
+
+		constexpr Vector_Iterator operator++() noexcept
 		{
 			++m_ptr;
 			return *this;
 		}
 
-		constexpr Iterator operator++(int) noexcept
+		constexpr Vector_Iterator operator++(int) noexcept
 		{
-			Iterator temp(*this);
+			Vector_Iterator temp(*this);
 			++m_ptr;
 			return temp;
 		}
 
-		constexpr bool operator!=(const Iterator& rhs) noexcept { return m_ptr != rhs.m_ptr; }
-		constexpr T operator*() noexcept { return *m_ptr; }
+		constexpr PType operator->() noexcept { return m_ptr; }
+		constexpr bool operator!=(const Vector_Iterator& rhs) noexcept { return m_ptr != rhs.m_ptr; }
+		constexpr ValueType operator*() { return *m_ptr; }
 
 	private:
-		T* m_ptr;
+		PType m_ptr;
 	};
+
 
 	template <typename T>
 	class Vector 
 	{
+	public:
+		using ValueType = T;
+		using Iterator = typename Vector_Iterator<Vector<T>>;
+
+
 	public: // public constructors offered by the vector class
 
 		/// Vector default constructor
@@ -59,11 +70,14 @@ namespace zzstl
 
 		Vector(const Vector& rhs) 
 		{
-			Clear();
-			if (m_Capacity != rhs.Capacity()) ReAlloc(rhs.Capacity());
+			if (rhs.m_Data)
+			{
+				ReAlloc(rhs.Capacity());
+				for (size_t i = 0; i < rhs.m_Size; ++i) new (&m_Data[i]) T(rhs[i]);
+			}
 
-			m_Size = rhs.Size();
-			for (size_t i = 0; i < m_Size; ++i) new (&m_Data[i]) T(rhs[i]);
+			m_Size = rhs.m_Size;
+			m_Capacity = rhs.m_Capacity;
 		}
 
 		Vector& operator=(const Vector& rhs)
@@ -72,9 +86,9 @@ namespace zzstl
 
 			Clear();
 			if (m_Capacity != rhs.Capacity()) ReAlloc(rhs.Capacity());
-			
-			for (size_t i = 0; i < rhs.Size(); ++i) new (&m_Data[i]) T(rhs[i]);
-			m_Size = rhs.Size();
+			for (size_t i = 0; i < rhs.m_Size; ++i) new (&m_Data[i]) T(rhs[i]);
+			m_Size = rhs.m_Size;
+
 			return *this;
 		}
 
@@ -124,8 +138,8 @@ namespace zzstl
 		constexpr inline T* Data() noexcept { return m_Data; }
 		constexpr inline const T* Data() const noexcept { return m_Data; }
 
-		constexpr Iterator<T> begin() noexcept { return Iterator<T>(m_Data); }
-		constexpr Iterator<T> end() noexcept { return Iterator<T>(m_Data + m_Size); }
+		constexpr Iterator begin() noexcept { return Iterator(m_Data); }
+		constexpr Iterator end() noexcept { return Iterator(m_Data + m_Size); }
 
 
 		constexpr T& Front()
