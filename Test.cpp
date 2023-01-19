@@ -49,29 +49,35 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v3)  {
 
 int main() {
 	zzstl::Vector<int> v;
-
 	v.PushBack(1);
 	v.PushBack(2);
 	v.PushBack(3);
 	v.PushBack(4);
 	v.PushBack(5);
-	v.PushBack(6);
-	v.PushBack(7);
-	v.PushBack(8);
-	v.PushBack(9);
-	v.PushBack(10);
-	zzstl::Vector<int>::Iterator it = v.begin();
+	//v.PushBack(6);
+	//v.PushBack(7);
+	//v.PushBack(8);
+	//v.PushBack(9);
+	//v.PushBack(10);
+	//zzstl::Vector<int>::Iterator it = v.begin();
 
-	std::cout << it[0] << std::endl;
-	std::cout << it[3] << std::endl;
-	std::cout << it[5] << std::endl;
-	std::cout << it[9] << std::endl;
-	std::cout << it[10] << std::endl;
-
-
-	//std::vector<int> v = { 1, 2, 3, 4, 5 };
-	//std::vector<int>::iterator it = v.begin();
+	//std::cout << it[0] << std::endl;
+	//std::cout << it[3] << std::endl;
 	//std::cout << it[5] << std::endl;
+	//std::cout << it[9] << std::endl;
+	//std::cout << it[10] << std::endl;
+
+
+	std::vector<int> v1 = { 1, 2, 3, 4, 5 };
+	std::vector<int>::iterator it1 = v1.begin();
+	v1.insert(it1 + 2, 0);
+	for (auto i : v1) std::cout << i << std::endl;
+
+
+	zzstl::Vector<int>::Iterator it = v.begin(); ++it; ++it;
+	std::cout << *it << std::endl;
+	v.insert(it, 0);
+	std::cout << v;
 
 	return 0;
 }

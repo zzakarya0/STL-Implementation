@@ -44,6 +44,7 @@ namespace zzstl
 			return temp;
 		}
 
+		// Operator overload supported by the iterator
 		constexpr ValueType& operator[](size_t pos) { return *(m_ptr + pos); }
 		constexpr bool operator==(const Vector_Iterator rhs) noexcept { return m_ptr == rhs.m_ptr; }
 		constexpr bool operator!=(const Vector_Iterator rhs) noexcept { return m_ptr != rhs.m_ptr; }
@@ -250,6 +251,25 @@ namespace zzstl
 		{
 			for (size_t i = 0; i < m_Size; ++i) m_Data[i].~T();
 			m_Size = 0;
+		}
+
+		constexpr void insert(Iterator Where, ValueType Value)
+		{
+			if (m_Size == m_Capacity) ReAlloc(Max(static_cast<size_t>(2), m_Capacity + m_Capacity / 2));
+
+			size_t pos = -1;
+			for (size_t i = 0; i < m_Size; ++i) 
+				if (*Where == m_Data[i]) 
+				{
+					pos = i;
+					break;
+				}
+
+			assert(pos != -1);
+			std::memmove(m_Data + pos + 1, m_Data + pos, (m_Size - pos) * sizeof(ValueType));
+			m_Data[pos].~T();
+			new (m_Data + pos) T(Value);
+			++m_Size;
 		}
 
 	private: //	Utility functions only used internally by the public interface functions
