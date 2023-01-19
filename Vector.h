@@ -13,10 +13,9 @@ namespace zzstl
 	{
 	public:
 		using ValueType = typename Vector::ValueType;
-		using PType = ValueType*;
 
 	public:
-		constexpr Vector_Iterator(PType Data) noexcept : m_ptr(Data) {}
+		constexpr Vector_Iterator(ValueType* Data) noexcept : m_ptr(Data) {}
 		constexpr Vector_Iterator(const Vector_Iterator& rhs) noexcept : m_ptr(rhs.m_ptr) {}
 
 		constexpr Vector_Iterator operator++() noexcept
@@ -32,12 +31,27 @@ namespace zzstl
 			return temp;
 		}
 
-		constexpr PType operator->() noexcept { return m_ptr; }
-		constexpr bool operator!=(const Vector_Iterator& rhs) noexcept { return m_ptr != rhs.m_ptr; }
-		constexpr ValueType operator*() { return *m_ptr; }
+		constexpr Vector_Iterator operator--() noexcept
+		{
+			--m_ptr;
+			return *this;
+		}
+
+		constexpr Vector_Iterator operator--(int) noexcept
+		{
+			Vector_Iterator temp(*this);
+			--m_ptr;
+			return temp;
+		}
+
+		constexpr ValueType& operator[](size_t pos) { return *(m_ptr + pos); }
+		constexpr bool operator==(const Vector_Iterator rhs) noexcept { return m_ptr == rhs.m_ptr; }
+		constexpr bool operator!=(const Vector_Iterator rhs) noexcept { return m_ptr != rhs.m_ptr; }
+		constexpr ValueType* operator->() noexcept { return m_ptr; }
+		constexpr ValueType& operator*() { return *m_ptr; }
 
 	private:
-		PType m_ptr;
+		ValueType* m_ptr;
 	};
 
 
@@ -46,6 +60,8 @@ namespace zzstl
 	{
 	public:
 		using ValueType = T;
+		using PType = ValueType*;
+		using RefType = ValueType&;
 		using Iterator = typename Vector_Iterator<Vector<T>>;
 
 
@@ -135,50 +151,50 @@ namespace zzstl
 		constexpr inline bool Empty() const noexcept { return m_Size == 0; }
 
 		//	Pointer to internal data array
-		constexpr inline T* Data() noexcept { return m_Data; }
-		constexpr inline const T* Data() const noexcept { return m_Data; }
+		constexpr inline PType Data() noexcept { return m_Data; }
+		constexpr inline const PType Data() const noexcept { return m_Data; }
 
 		constexpr Iterator begin() noexcept { return Iterator(m_Data); }
 		constexpr Iterator end() noexcept { return Iterator(m_Data + m_Size); }
 
 
-		constexpr T& Front()
+		constexpr RefType Front()
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
-		constexpr const T& Front() const 
+		constexpr const RefType Front() const 
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
-		constexpr T& Back()
+		constexpr RefType Back()
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
-		constexpr const T& Back() const
+		constexpr const RefType Back() const
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
-		constexpr T& operator[] (size_t pos)  
+		constexpr RefType operator[] (size_t pos)  
 		{
 			assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
-		constexpr const T& operator[] (size_t pos) const 
+		constexpr const RefType operator[] (size_t pos) const 
 		{
 			assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
-		void PushBack(const T& val) 
+		void PushBack(const RefType val) 
 		{
 			if (m_Size == m_Capacity) ReAlloc(Max(static_cast<size_t>(2), m_Capacity + m_Capacity / 2));
 
@@ -257,10 +273,10 @@ namespace zzstl
 	private: //	Member Data
 		size_t m_Size = 0;
 		size_t m_Capacity = 0;
-		T* m_Data;
+		PType m_Data;
 	};
 
-	//	Utility function to facilitate printing of entire vector elements
+	//	Function to facilitate printing of entire vector elements
 	template<typename T>
 	std::ostream& operator<<(std::ostream& os, const Vector<T>& vector) 
 	{

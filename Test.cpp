@@ -48,35 +48,30 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v3)  {
 }
 
 int main() {
-	//zzstl::Vector<int> v;
+	zzstl::Vector<int> v;
 
-	//v.PushBack(1);
-	//v.PushBack(2);
-	//v.PushBack(3);
-	//v.PushBack(4);
-	//v.PushBack(5);
-	//v.PushBack(6);
-	//v.PushBack(7);
-	//v.PushBack(8);
-	//v.PushBack(9);
-	//v.PushBack(10);
-	//std::cout << v;
+	v.PushBack(1);
+	v.PushBack(2);
+	v.PushBack(3);
+	v.PushBack(4);
+	v.PushBack(5);
+	v.PushBack(6);
+	v.PushBack(7);
+	v.PushBack(8);
+	v.PushBack(9);
+	v.PushBack(10);
+	zzstl::Vector<int>::Iterator it = v.begin();
 
-	////for (zzstl::Iterator<int> it = v.begin(); it != v.end(); ++it) std::cout << *it << std::endl;
-	//for (int i : v) std::cout << i << std::endl;
+	std::cout << it[0] << std::endl;
+	std::cout << it[3] << std::endl;
+	std::cout << it[5] << std::endl;
+	std::cout << it[9] << std::endl;
+	std::cout << it[10] << std::endl;
 
-	std::vector<Vector3> v;
-	std::vector<Vector3>::iterator it = v.begin();
-	it->f();
 
-	zzstl::Vector<Vector3> v11;
-	zzstl::Vector<Vector3>::Iterator it11 = v11.begin();
-	(*it11).f();
-	it11->f();
+	//std::vector<int> v = { 1, 2, 3, 4, 5 };
+	//std::vector<int>::iterator it = v.begin();
+	//std::cout << it[5] << std::endl;
 
-	Vector3 v3;
-	Vector3* pv3 = &v3;
-	pv3->f();
-
-	std::cin.get();
+	return 0;
 }
