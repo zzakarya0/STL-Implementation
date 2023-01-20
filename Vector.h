@@ -8,13 +8,68 @@
 
 namespace zzstl 
 {
+	template <typename Vector>
+	class Vector_Iterator 
+	{
+	public:
+		using ValueType = typename Vector::ValueType;
+
+	public:
+		constexpr Vector_Iterator(ValueType* Data) noexcept : m_ptr(Data) {}
+		constexpr Vector_Iterator(const Vector_Iterator& rhs) noexcept : m_ptr(rhs.m_ptr) {}
+
+		constexpr Vector_Iterator operator++() noexcept
+		{
+			++m_ptr;
+			return *this;
+		}
+
+		constexpr Vector_Iterator operator++(int) noexcept
+		{
+			Vector_Iterator temp(*this);
+			++m_ptr;
+			return temp;
+		}
+
+		constexpr Vector_Iterator operator--() noexcept
+		{
+			--m_ptr;
+			return *this;
+		}
+
+		constexpr Vector_Iterator operator--(int) noexcept
+		{
+			Vector_Iterator temp(*this);
+			--m_ptr;
+			return temp;
+		}
+
+		// Operator overload supported by the iterator
+		constexpr ValueType& operator[](size_t pos) { return *(m_ptr + pos); }
+		constexpr bool operator==(const Vector_Iterator rhs) noexcept { return m_ptr == rhs.m_ptr; }
+		constexpr bool operator!=(const Vector_Iterator rhs) noexcept { return m_ptr != rhs.m_ptr; }
+		constexpr ValueType* operator->() noexcept { return m_ptr; }
+		constexpr ValueType& operator*() { return *m_ptr; }
+
+	private:
+		ValueType* m_ptr;
+	};
+
+
 	template <typename T>
 	class Vector 
 	{
+	public:
+		using ValueType = T;
+		using PType = ValueType*;
+		using RefType = ValueType&;
+		using Iterator = typename Vector_Iterator<Vector<T>>;
+
+
 	public: // public constructors offered by the vector class
 
 		/// Vector default constructor
-		Vector() noexcept : m_Size(0), m_Capacity(0), m_Data(nullptr) {} 
+		constexpr Vector() noexcept : m_Size(0), m_Capacity(0), m_Data(nullptr) {} 
 		
 		/// Constructor taking the size/capacity of container and intiallizing with default value 
 		explicit Vector(size_t size) {
@@ -32,11 +87,14 @@ namespace zzstl
 
 		Vector(const Vector& rhs) 
 		{
-			Clear();
-			if (m_Capacity != rhs.Capacity()) ReAlloc(rhs.Capacity());
+			if (rhs.m_Data)
+			{
+				ReAlloc(rhs.Capacity());
+				for (size_t i = 0; i < rhs.m_Size; ++i) new (&m_Data[i]) T(rhs[i]);
+			}
 
-			m_Size = rhs.Size();
-			for (size_t i = 0; i < m_Size; ++i) new (&m_Data[i]) T(rhs[i]);
+			m_Size = rhs.m_Size;
+			m_Capacity = rhs.m_Capacity;
 		}
 
 		Vector& operator=(const Vector& rhs)
@@ -45,9 +103,9 @@ namespace zzstl
 
 			Clear();
 			if (m_Capacity != rhs.Capacity()) ReAlloc(rhs.Capacity());
-			
-			for (size_t i = 0; i < rhs.Size(); ++i) new (&m_Data[i]) T(rhs[i]);
-			m_Size = rhs.Size();
+			for (size_t i = 0; i < rhs.m_Size; ++i) new (&m_Data[i]) T(rhs[i]);
+			m_Size = rhs.m_Size;
+
 			return *this;
 		}
 
@@ -86,54 +144,58 @@ namespace zzstl
 	public: // Public member functions offered by the class
 
 		//	Returns current number of elements in the container
-		inline size_t Size() const noexcept { return m_Size; }
+		constexpr inline size_t Size() const noexcept { return m_Size; }
 
 		//	Returns number of elements the container can take before a re-allocation
-		inline size_t Capacity() const  noexcept { return m_Capacity; }
+		constexpr inline size_t Capacity() const  noexcept { return m_Capacity; }
 
-		inline bool Empty() const noexcept { return m_Size == 0; }
+		constexpr inline bool Empty() const noexcept { return m_Size == 0; }
 
 		//	Pointer to internal data array
-		inline T* Data() noexcept { return m_Data; }
-		inline const T* Data() const noexcept { return m_Data; }
+		constexpr inline PType Data() noexcept { return m_Data; }
+		constexpr inline const PType Data() const noexcept { return m_Data; }
 
-		T& Front()
+		constexpr Iterator begin() noexcept { return Iterator(m_Data); }
+		constexpr Iterator end() noexcept { return Iterator(m_Data + m_Size); }
+
+
+		constexpr RefType Front()
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
-		const T& Front() const 
+		constexpr const RefType Front() const 
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return *m_Data;
 		}
 
-		T& Back()
+		constexpr RefType Back()
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
-		const T& Back() const
+		constexpr const RefType Back() const
 		{
 			assert(m_Size >= 0, "Cannot retrieve from empty vector");
 			return m_Data[m_Size - 1];
 		}
 
-		T& operator[] (size_t pos)  
+		constexpr RefType operator[] (size_t pos)  
 		{
 			assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
-		const T& operator[] (size_t pos) const 
+		constexpr const RefType operator[] (size_t pos) const 
 		{
 			assert(m_Size > pos, "Index out of bounds");
 			return m_Data[pos];
 		}
 
-		void PushBack(const T& val) 
+		void PushBack(const RefType val) 
 		{
 			if (m_Size == m_Capacity) ReAlloc(Max(static_cast<size_t>(2), m_Capacity + m_Capacity / 2));
 
@@ -151,7 +213,7 @@ namespace zzstl
 
 		void PopBack() 
 		{
-			assert(m_Size != 0, "Cannot pop from an empty vector.");
+			static_assert(m_Size != 0, "Cannot pop from an empty vector.");
 			m_Data[--m_Size].~T();
 		}
 
@@ -191,6 +253,25 @@ namespace zzstl
 			m_Size = 0;
 		}
 
+		constexpr void insert(Iterator Where, ValueType Value)
+		{
+			if (m_Size == m_Capacity) ReAlloc(Max(static_cast<size_t>(2), m_Capacity + m_Capacity / 2));
+
+			size_t pos = -1;
+			for (size_t i = 0; i < m_Size; ++i) 
+				if (*Where == m_Data[i]) 
+				{
+					pos = i;
+					break;
+				}
+
+			assert(pos != -1);
+			std::memmove(m_Data + pos + 1, m_Data + pos, (m_Size - pos) * sizeof(ValueType));
+			m_Data[pos].~T();
+			new (m_Data + pos) T(Value);
+			++m_Size;
+		}
+
 	private: //	Utility functions only used internally by the public interface functions
 
 		//	Re-alloc to either expand/shrink internal m_Data container
@@ -212,10 +293,10 @@ namespace zzstl
 	private: //	Member Data
 		size_t m_Size = 0;
 		size_t m_Capacity = 0;
-		T* m_Data;
+		PType m_Data;
 	};
 
-	//	Utility function to facilitate printing of entire vector elements
+	//	Function to facilitate printing of entire vector elements
 	template<typename T>
 	std::ostream& operator<<(std::ostream& os, const Vector<T>& vector) 
 	{
