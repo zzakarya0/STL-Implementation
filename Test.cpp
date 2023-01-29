@@ -1,8 +1,10 @@
 #include <iostream>
 
-#include "Vector.h"
-#include <vector>
-#include <string>
+#include<bitset>
+#include "Array.h"
+#include <array>
+#include< string>
+#include <stdio.h>
 
 struct Vector3 {
 	float _x, _y, _z;
@@ -47,37 +49,42 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v3)  {
 	return os;
 }
 
-int main() {
-	zzstl::Vector<int> v;
-	v.PushBack(1);
-	v.PushBack(2);
-	v.PushBack(3);
-	v.PushBack(4);
-	v.PushBack(5);
-	//v.PushBack(6);
-	//v.PushBack(7);
-	//v.PushBack(8);
-	//v.PushBack(9);
-	//v.PushBack(10);
-	//zzstl::Vector<int>::Iterator it = v.begin();
+int main()
+{
+	std::array<Vector3, 2> z{ Vector3(1.f), Vector3(2.f) };
+	std::array<Vector3, 2> z1{ Vector3(9.f), Vector3(8.f) };
+	z.swap(z1);
+	for (auto& c : z) std::cout << c << " | "; std::cout << "\n";
+	for (auto& c : z1) std::cout << c << " | "; std::cout << "\n";
+	std::cout << z.at(0) << std::endl;;
+	std::cout << z1.at(0) << std::endl;
+	auto it = z.begin();
+	it[0] = Vector3(100.f);
+	it.operator[](3);
+	for (auto& c : z) std::cout << c << " | "; std::cout << "\n";
+	////why must use {} instead of ()
+	//constexpr std::array<char[3], 5> d{ "ab", "b", "c", "d", "e" };
+	//std::cout << d.empty() << std::endl;
+	//for (auto n : d) std::cout << n << std::endl;
+	//std::cout << "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n";
+	//std::cout << d.at(0) << std::endl;
 
-	//std::cout << it[0] << std::endl;
-	//std::cout << it[3] << std::endl;
-	//std::cout << it[5] << std::endl;
-	//std::cout << it[9] << std::endl;
-	//std::cout << it[10] << std::endl;
+	//constexpr zzstl::Array<char[2], 2> a("a", "b");
+	//std::cout << a[0] << std::endl;
+	//a.Front();
+	//a.Print();
+	//std::cout << a.At(0) << std::endl;
+	
+	std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+	zzstl::Array<Vector3, 2 > a2{ Vector3(1.f), Vector3(2.f) };
+	zzstl::Array<Vector3, 2>  a3{ Vector3(9.f), Vector3(8.f) };
+	a2.Swap(a3);
+	a2.Print();
+	a3.Print();
+	std::cout << a2.At(0) << std::endl;
+	std::cout << a3.At(0) << std::endl;
+	
 
-
-	std::vector<int> v1 = { 1, 2, 3, 4, 5 };
-	std::vector<int>::iterator it1 = v1.begin();
-	v1.insert(it1 + 2, 0);
-	for (auto i : v1) std::cout << i << std::endl;
-
-
-	zzstl::Vector<int>::Iterator it = v.begin(); ++it; ++it;
-	std::cout << *it << std::endl;
-	v.insert(it, 0);
-	std::cout << v;
-
-	return 0;
+	printf()
+	std::cin.get();
 }
