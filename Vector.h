@@ -8,6 +8,9 @@
 
 namespace zzstl 
 {
+	/*
+	*	New things learned:		. placement new, constexpr, noexcept, std::byte, std::memmove
+	*/
 	template <typename Vector>
 	class Vector_Iterator 
 	{
@@ -72,7 +75,7 @@ namespace zzstl
 		constexpr Vector() noexcept : m_Size(0), m_Capacity(0), m_Data(nullptr) {} 
 		
 		/// Constructor taking the size/capacity of container and intiallizing with default value 
-		explicit Vector(size_t size) {
+		constexpr explicit Vector(size_t size) {
 			ReAlloc(size);
 			m_Size = m_Capacity;
 			for (size_t i = 0; i < m_Size; ++i) new (&m_Data[i]) T();
@@ -135,10 +138,11 @@ namespace zzstl
 		}
 
 		// Vector destructor
-		~Vector() 
+		constexpr ~Vector() 
 		{
 			Clear();
 			::operator delete(m_Data, m_Capacity * sizeof(T));
+			//Why use operator delete instead of:	delete[] m_Data;	operator delete isnt constexpr
 		}
 	
 	public: // Public member functions offered by the class
@@ -247,7 +251,7 @@ namespace zzstl
 			m_Size = NewSize;
 		}
 
-		void Clear() 
+		constexpr void Clear() 
 		{
 			for (size_t i = 0; i < m_Size; ++i) m_Data[i].~T();
 			m_Size = 0;
