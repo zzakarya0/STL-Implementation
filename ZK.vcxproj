@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="Array.h" />
     <ClInclude Include="Iterators.h" />
+    <ClInclude Include="List.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
