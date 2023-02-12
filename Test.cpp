@@ -1,5 +1,6 @@
 #include <iostream>
 #include "List.h"
+#include <list>
 
 
 struct Vector3 {
@@ -47,9 +48,13 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v3)  {
 
 int main()
 {
-	zzstl::List<int> lst;
+	std::list<int> stdL(3);
+	int a = 5;
+	stdL.push_back(a);
 
-
+	zzstl::List<Vector3> lst(Vector3(0.f));
+	lst.Push_Back(Vector3(4.f));
+	lst.Print();
 
 
 	std::cin.get();
