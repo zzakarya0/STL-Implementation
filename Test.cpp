@@ -53,7 +53,10 @@ int main()
 	stdL.push_back(a);
 
 	zzstl::List<Vector3> lst(Vector3(0.f));
-	lst.Push_Back(Vector3(4.f));
+	lst.Push_Back(Vector3(1.f));
+	lst.Push_Back(Vector3(2.f));
+	lst.Push_Back(Vector3(3.f));
+
 	lst.Print();
 
 

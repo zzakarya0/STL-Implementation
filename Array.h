@@ -76,7 +76,7 @@ namespace zzstl
 		using Const_Iterator = Array_Const_Iterator<Type, S>;
 		using Iterator = Array_Iterator<Type, S>;
 
-		/*	Constructors ommited for enable aggregate initialization
+		/*	Ctors ommited to enable aggregate initialization
 		Array() = default;
 		Array(const Array& rhs) = default;
 		Array& operator=(const Array& rhs) = default;
