@@ -64,6 +64,7 @@ namespace zzstl
 	public:
 		// 
 		constexpr bool isEmpty() const noexcept { return m_pHead == nullptr; }
+		constexpr size_t size() const noexcept { return m_size; }
 
 		//	Print functionality
 		constexpr void printForward() const noexcept;
@@ -72,18 +73,19 @@ namespace zzstl
 		//	Add to list
 		constexpr void pushBack(const Type& Val) noexcept;
 		constexpr void pushBack(Type&& Val) noexcept;
-		constexpr void pushBack(const Type& Val) noexcept requires IsDoubly;
-		constexpr void pushBack(Type&& Val) noexcept requires IsDoubly;
 		constexpr void pushFront(const Type& Val) noexcept;
 		constexpr void pushFront(Type&& Val) noexcept;
+
+		constexpr void pushBack(const Type& Val) noexcept requires IsDoubly;
+		constexpr void pushBack(Type&& Val) noexcept requires IsDoubly;
 		constexpr void pushFront(const Type& Val) noexcept requires IsDoubly;
 		constexpr void pushFront(Type&& Val) noexcept requires IsDoubly;
 
 		// Pop from list
 		constexpr void popBack() noexcept;
-		constexpr void popFront() noexcept;
+		constexpr void popFront() noexcept;	// no need for specialized popFront()
+
 		constexpr void popBack() noexcept requires IsDoubly;
-		constexpr void popFront() noexcept requires IsDoubly;
 
 	private:
 		Node* m_pHead;
@@ -154,18 +156,53 @@ namespace zzstl
 	template <typename Type, bool IsDoubly>
 	constexpr void List<Type, IsDoubly>::pushBack(Type&& Val) noexcept
 	{
-		if (!m_pHead) 
+		if (!m_pHead)
 		{
 			m_pHead = new zzstl::Node<Type, IsDoubly>(std::move(Val));
 			m_pTail = m_pHead;
 		}
-		else 
+		else
 		{
 			m_pTail->m_pNext = new zzstl::Node<Type, IsDoubly>(std::move(Val));
 			m_pTail = m_pTail->m_pNext;
 		}
 		++m_size;
 	}
+	
+	template <typename Type, bool IsDoubly>
+	constexpr void List<Type, IsDoubly>::pushFront(const Type& Val) noexcept
+	{
+		Node* newNode = new zzstl::Node<Type, IsDoubly>(Val);
+		if (!m_pHead)
+		{
+			m_pHead = newNode;
+			m_pTail = m_pHead;
+		}
+		else
+		{
+			newNode->m_pNext = m_pHead;
+			m_pHead = newNode;
+		}
+		++m_size;
+	}
+
+	template <typename Type, bool IsDoubly>
+	constexpr void List<Type, IsDoubly>::pushFront(Type&& Val) noexcept
+	{
+		Node* newNode = new zzstl::Node<Type, IsDoubly>(std::move(Val));
+		if (!m_pHead)
+		{
+			m_pHead = newNode;
+			m_pTail = m_pHead;
+		}
+		else
+		{
+			newNode->m_pNext = m_pHead;
+			m_pHead = newNode;
+		}
+		++m_size;
+	}
+
 
 	template <typename Type, bool IsDoubly>
 	constexpr void List<Type, IsDoubly>::pushBack(const Type& Val) noexcept requires IsDoubly
@@ -202,23 +239,6 @@ namespace zzstl
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::pushFront(const Type& Val) noexcept
-	{
-		Node* newNode = new zzstl::Node<Type, IsDoubly>(Val);
-		if (!m_pHead)
-		{
-			m_pHead = newNode;
-			m_pTail = m_pHead;
-		}
-		else
-		{
-			newNode->m_pNext = m_pHead;
-			m_pHead = newNode;
-		}
-		++m_size;
-	}
-
-	template <typename Type, bool IsDoubly>
 	constexpr void List<Type, IsDoubly>::pushFront(const Type& Val) noexcept requires IsDoubly
 	{
 		if (!m_pHead)
@@ -231,23 +251,6 @@ namespace zzstl
 			m_pHead->m_pPrev = new zzstl::Node<Type, IsDoubly>(Val);
 			m_pHead->m_pPrev->m_pNext = m_pHead;
 			m_pHead = m_pHead->m_pPrev;
-		}
-		++m_size;
-	}
-
-	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::pushFront(Type&& Val) noexcept
-	{
-		Node* newNode = new zzstl::Node<Type, IsDoubly>(std::move(Val));
-		if (!m_pHead)
-		{
-			m_pHead = newNode;
-			m_pTail = m_pHead;
-		}
-		else
-		{
-			newNode->m_pNext = m_pHead;
-			m_pHead = newNode;
 		}
 		++m_size;
 	}
@@ -273,9 +276,26 @@ namespace zzstl
 	//	Pop from list
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	template <typename Type, bool IsDoubly>
+	constexpr void List<Type, IsDoubly>::popFront() noexcept
+	{
+		if (isEmpty()) return;
+
+		Node* newHead = m_pHead->m_pNext;
+		delete m_pHead;
+		m_pHead = newHead;
+		--m_size;
+	}
+		
+	template <typename Type, bool IsDoubly>
 	constexpr void List<Type, IsDoubly>::popBack() noexcept
 	{
 		if (isEmpty()) return;
+		if (m_size == 1) {
+			delete m_pHead;
+			m_pHead = m_pTail = nullptr;
+			m_size = 0;
+			return;
+		}
 
 		Node* curr = m_pHead;
 		while (curr->m_pNext->m_pNext) curr = curr->m_pNext;
@@ -283,6 +303,7 @@ namespace zzstl
 		delete curr->m_pNext;
 		m_pTail = curr;
 		m_pTail->m_pNext = nullptr;
+		--m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
@@ -290,10 +311,11 @@ namespace zzstl
 	{
 		if (isEmpty()) return;
 
-		Node* prevTail = m_pTail;
-		m_pTail = m_pTail->m_pPrev;
-		delete prevTail;
+		Node* newTail = m_pTail->m_pPrev;
+		delete m_pTail;
+		m_pTail = newTail;
 		m_pTail->m_pNext = nullptr;
+		--m_size;
 	}
 }
 
