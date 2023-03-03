@@ -83,9 +83,10 @@ namespace zzstl
 
 		// Pop from list
 		constexpr void popBack() noexcept;
-		constexpr void popFront() noexcept;	// no need for specialized popFront()
+		constexpr void popFront() noexcept;	
 
 		constexpr void popBack() noexcept requires IsDoubly;
+		constexpr void popFront() noexcept requires IsDoubly;
 
 	private:
 		Node* m_pHead;
@@ -307,9 +308,27 @@ namespace zzstl
 	}
 
 	template <typename Type, bool IsDoubly>
+	constexpr void List<Type, IsDoubly>::popFront() noexcept requires IsDoubly
+	{
+		if (isEmpty()) return;
+
+		Node* newHead = m_pHead->m_pNext;
+		delete m_pHead;
+		m_pHead = newHead;
+		newHead != nullptr ? newHead->m_pPrev = nullptr : newHead;
+		--m_size;
+	}
+
+	template <typename Type, bool IsDoubly>
 	constexpr void List<Type, IsDoubly>::popBack() noexcept requires IsDoubly
 	{
 		if (isEmpty()) return;
+		if (m_size == 1) {
+			delete m_pHead;
+			m_pHead = m_pTail = nullptr;
+			m_size = 0;
+			return;
+		}
 
 		Node* newTail = m_pTail->m_pPrev;
 		delete m_pTail;

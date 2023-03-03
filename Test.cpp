@@ -63,7 +63,7 @@ int main()
 	Vector3 vn4(-4.f);
 	Vector3 vn5(-5.f);
 
-	zzstl::List<Vector3> lst(Vector3(0.f, 1.f, 2.f));
+	zzstl::List<Vector3, true> lst(Vector3(0.f, 1.f, 2.f));
 	lst.pushBack(Vector3(3.f, 4.f, 5.f));
 	lst.pushBack(Vector3(6.f));
 	lst.pushBack(Vector3(7.f));
@@ -71,7 +71,7 @@ int main()
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
-	//lst.Print_Backward();
+	lst.printBackward();
 
 	lst.pushFront(Vector3(-1.f));
 	lst.pushFront(Vector3(-2.f));
@@ -79,7 +79,7 @@ int main()
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
-	//lst.Print_Backward();
+	lst.printBackward();
 
 	lst.pushBack(v9);
 	lst.pushBack(v10);
@@ -88,25 +88,34 @@ int main()
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
-	//lst.Print_Backward();
+	lst.printBackward();
 
-	lst.popBack();
-	lst.popBack();
+	lst.popFront();
+	lst.popFront();
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
-	//lst.Print_Backward();
+	lst.printBackward();
 
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
-	lst.popBack();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
+	lst.popFront();
 	lst.popBack();
 	lst.popBack();
 	lst.popBack();
@@ -125,6 +134,7 @@ int main()
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
+	lst.printBackward();
 
 	lst.pushBack(std::move(v9));
 	lst.pushBack(std::move(v10));
@@ -133,6 +143,7 @@ int main()
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
+	lst.printBackward();
 
 	lst.pushBack(v9);
 	lst.pushBack(v10);
@@ -141,6 +152,7 @@ int main()
 
 	std::cout << "Size: " << lst.size() << std::endl;
 	lst.printForward();
+	lst.printBackward();
 
 	std::cin.get();
 }
