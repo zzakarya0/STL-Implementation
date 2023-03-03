@@ -14,35 +14,35 @@ namespace zzstl
 	template <typename Type, bool IsDoubly>
 	class Node
 	{
-		constexpr Node(const Type& Val) noexcept : m_Val(Val), m_pNext(nullptr) {}
-		constexpr Node(Type&& Val) noexcept : m_Val(std::move(Val)), m_pNext(nullptr) {}
+		constexpr Node(const Type& Val) noexcept : m_val(Val), m_pNext(nullptr) {}
+		constexpr Node(Type&& Val) noexcept : m_val(std::move(Val)), m_pNext(nullptr) {}
 		constexpr ~Node() noexcept { m_pNext = nullptr; }
 
 	private:
-		Type m_Val;
+		Type m_val;
 		Node* m_pNext;
 
 		// Friend functions/classes
 		template <typename T, bool IsDoubly> friend class List;
-		friend constexpr std::ostream& operator<<(std::ostream& os, const Node& Node) noexcept { os << Node.m_Val << " --> "; return os; }
+		friend constexpr std::ostream& operator<<(std::ostream& os, const Node& Node) noexcept { os << Node.m_val << " --> "; return os; }
 	};
 
 	template <typename Type>
 	class Node<Type, true>
 	{
 	public:
-		constexpr Node(const Type& Val) noexcept : m_Val(Val), m_pNext(nullptr), m_pPrev(nullptr) {}
-		constexpr Node(Type&& Val) noexcept : m_Val(std::move(Val)), m_pNext(nullptr), m_pPrev(nullptr) {}
+		constexpr Node(const Type& Val) noexcept : m_val(Val), m_pNext(nullptr), m_pPrev(nullptr) {}
+		constexpr Node(Type&& Val) noexcept : m_val(std::move(Val)), m_pNext(nullptr), m_pPrev(nullptr) {}
 		constexpr ~Node() noexcept { m_pNext = m_pPrev = nullptr; }
 
 	private:
-		Type m_Val;
+		Type m_val;
 		Node* m_pNext;
 		Node* m_pPrev;
 
 		// Friend functions/classes
 		template <typename T, bool IsDoubly> friend class List;
-		friend constexpr std::ostream& operator<<(std::ostream& os, const Node& Node) noexcept { os << Node.m_Val << " --> "; return os; }
+		friend constexpr std::ostream& operator<<(std::ostream& os, const Node& Node) noexcept { os << Node.m_val << " --> "; return os; }
 	};
 
 
@@ -56,39 +56,39 @@ namespace zzstl
 	public:
 		using Node = zzstl::Node<Type, IsDoubly>;
 	
-		constexpr List() noexcept : m_pHead(nullptr), m_pTail(nullptr) {}
-		constexpr List(const Type& Val)  : m_pHead(new Node(Val)), m_pTail(m_pHead) {}
-		constexpr List(Type&& Val) : m_pHead(new Node(std::move(Val))), m_pTail(m_pHead) {}
+		constexpr List() noexcept : m_pHead(nullptr), m_pTail(nullptr), m_size(0) {}
+		constexpr List(const Type& Val)  : m_pHead(new Node(Val)), m_pTail(m_pHead), m_size(1) {}
+		constexpr List(Type&& Val) : m_pHead(new Node(std::move(Val))), m_pTail(m_pHead), m_size(1) {}
 		constexpr ~List() noexcept;
 
 	public:
 		// 
-		constexpr bool IsEmpty() const noexcept { return m_pHead == nullptr; }
+		constexpr bool isEmpty() const noexcept { return m_pHead == nullptr; }
 
 		//	Print functionality
-		constexpr void Print_Forward() const noexcept;
-		constexpr void Print_Backward() const noexcept requires IsDoubly;
+		constexpr void printForward() const noexcept;
+		constexpr void printBackward() const noexcept requires IsDoubly;
 
 		//	Add to list
-		constexpr void Push_Back(const Type& Val) noexcept;
-		constexpr void Push_Back(Type&& Val) noexcept;
-		constexpr void Push_Back(const Type& Val) noexcept requires IsDoubly;
-		constexpr void Push_Back(Type&& Val) noexcept requires IsDoubly;
-		constexpr void Push_Front(const Type& Val) noexcept;
-		constexpr void Push_Front(Type&& Val) noexcept;
-		constexpr void Push_Front(const Type& Val) noexcept requires IsDoubly;
-		constexpr void Push_Front(Type&& Val) noexcept requires IsDoubly;
+		constexpr void pushBack(const Type& Val) noexcept;
+		constexpr void pushBack(Type&& Val) noexcept;
+		constexpr void pushBack(const Type& Val) noexcept requires IsDoubly;
+		constexpr void pushBack(Type&& Val) noexcept requires IsDoubly;
+		constexpr void pushFront(const Type& Val) noexcept;
+		constexpr void pushFront(Type&& Val) noexcept;
+		constexpr void pushFront(const Type& Val) noexcept requires IsDoubly;
+		constexpr void pushFront(Type&& Val) noexcept requires IsDoubly;
 
 		// Pop from list
-		constexpr void Pop_Back() noexcept;
-		constexpr void Pop_Front() noexcept;
-		constexpr void Pop_Back() noexcept requires IsDoubly;
-		constexpr void Pop_Front() noexcept requires IsDoubly;
+		constexpr void popBack() noexcept;
+		constexpr void popFront() noexcept;
+		constexpr void popBack() noexcept requires IsDoubly;
+		constexpr void popFront() noexcept requires IsDoubly;
 
 	private:
 		Node* m_pHead;
 		Node* m_pTail;
-		size_t Size;
+		size_t m_size;
 	};
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,25 +109,25 @@ namespace zzstl
 	//	Print functionality
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Print_Forward() const noexcept
+	constexpr void List<Type, IsDoubly>::printForward() const noexcept
 	{
-		const Node* CurrNode = m_pHead;
-		while (CurrNode)
+		const Node* curNode = m_pHead;
+		while (curNode)
 		{
-			std::cout << *CurrNode;
-			CurrNode = CurrNode->m_pNext;
+			std::cout << *curNode;
+			curNode = curNode->m_pNext;
 		}
 		std::cout << "Null\n";
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Print_Backward() const noexcept requires IsDoubly
+	constexpr void List<Type, IsDoubly>::printBackward() const noexcept requires IsDoubly
 	{
-		const Node* CurrNode = m_pTail;
-		while (CurrNode)
+		const Node* curNode = m_pTail;
+		while (curNode)
 		{
-			std::cout << *CurrNode;
-			CurrNode = CurrNode->m_pPrev;
+			std::cout << *curNode;
+			curNode = curNode->m_pPrev;
 		}
 		std::cout << "Null\n";
 	}
@@ -136,22 +136,23 @@ namespace zzstl
 	//	Add to list
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Back(const Type& Val) noexcept
+	constexpr void List<Type, IsDoubly>::pushBack(const Type& Val) noexcept
 	{
-		if (!m_pHead)
+		if (!m_pHead) 
 		{
 			m_pHead = new zzstl::Node<Type, IsDoubly>(Val);
 			m_pTail = m_pHead;
 		}
-		else
+		else 
 		{
 			m_pTail->m_pNext = new zzstl::Node<Type, IsDoubly>(Val);
 			m_pTail = m_pTail->m_pNext;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Back(Type&& Val) noexcept
+	constexpr void List<Type, IsDoubly>::pushBack(Type&& Val) noexcept
 	{
 		if (!m_pHead) 
 		{
@@ -163,10 +164,11 @@ namespace zzstl
 			m_pTail->m_pNext = new zzstl::Node<Type, IsDoubly>(std::move(Val));
 			m_pTail = m_pTail->m_pNext;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Back(const Type& Val) noexcept requires IsDoubly
+	constexpr void List<Type, IsDoubly>::pushBack(const Type& Val) noexcept requires IsDoubly
 	{
 		if (!m_pHead)
 		{
@@ -179,10 +181,11 @@ namespace zzstl
 			m_pTail->m_pNext->m_pPrev = m_pTail;
 			m_pTail = m_pTail->m_pNext;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Back(Type&& Val) noexcept requires IsDoubly
+	constexpr void List<Type, IsDoubly>::pushBack(Type&& Val) noexcept requires IsDoubly
 	{
 		if (!m_pHead)
 		{
@@ -195,26 +198,28 @@ namespace zzstl
 			m_pTail->m_pNext->m_pPrev = m_pTail;
 			m_pTail = m_pTail->m_pNext;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Front(const Type& Val) noexcept
+	constexpr void List<Type, IsDoubly>::pushFront(const Type& Val) noexcept
 	{
-		Node* NewNode = new zzstl::Node<Type, IsDoubly>(Val);
+		Node* newNode = new zzstl::Node<Type, IsDoubly>(Val);
 		if (!m_pHead)
 		{
-			m_pHead = NewNode;
+			m_pHead = newNode;
 			m_pTail = m_pHead;
 		}
 		else
 		{
-			NewNode->m_pNext = m_pHead;
-			m_pHead = NewNode;
+			newNode->m_pNext = m_pHead;
+			m_pHead = newNode;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Front(const Type& Val) noexcept requires IsDoubly
+	constexpr void List<Type, IsDoubly>::pushFront(const Type& Val) noexcept requires IsDoubly
 	{
 		if (!m_pHead)
 		{
@@ -227,26 +232,28 @@ namespace zzstl
 			m_pHead->m_pPrev->m_pNext = m_pHead;
 			m_pHead = m_pHead->m_pPrev;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Front(Type&& Val) noexcept
+	constexpr void List<Type, IsDoubly>::pushFront(Type&& Val) noexcept
 	{
-		Node* NewNode = new zzstl::Node<Type, IsDoubly>(std::move(Val));
+		Node* newNode = new zzstl::Node<Type, IsDoubly>(std::move(Val));
 		if (!m_pHead)
 		{
-			m_pHead = NewNode;
+			m_pHead = newNode;
 			m_pTail = m_pHead;
 		}
 		else
 		{
-			NewNode->m_pNext = m_pHead;
-			m_pHead = NewNode;
+			newNode->m_pNext = m_pHead;
+			m_pHead = newNode;
 		}
+		++m_size;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Push_Front(Type&& Val) noexcept requires IsDoubly
+	constexpr void List<Type, IsDoubly>::pushFront(Type&& Val) noexcept requires IsDoubly
 	{
 		if (!m_pHead)
 		{
@@ -259,32 +266,33 @@ namespace zzstl
 			m_pHead->m_pPrev->m_pNext = m_pHead;
 			m_pHead = m_pHead->m_pPrev;
 		}
+		++m_size;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//	Pop from list
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Pop_Back() noexcept
+	constexpr void List<Type, IsDoubly>::popBack() noexcept
 	{
-		if (IsEmpty()) return;
+		if (isEmpty()) return;
 
-		Node* Curr = m_pHead;
-		while (Curr->m_pNext->m_pNext) Curr = Curr->m_pNext;
+		Node* curr = m_pHead;
+		while (curr->m_pNext->m_pNext) curr = curr->m_pNext;
 
-		delete Curr->m_pNext;
-		m_pTail = Curr;
+		delete curr->m_pNext;
+		m_pTail = curr;
 		m_pTail->m_pNext = nullptr;
 	}
 
 	template <typename Type, bool IsDoubly>
-	constexpr void List<Type, IsDoubly>::Pop_Back() noexcept requires IsDoubly
+	constexpr void List<Type, IsDoubly>::popBack() noexcept requires IsDoubly
 	{
-		if (IsEmpty()) return;
+		if (isEmpty()) return;
 
-		Node* PrevTail = m_pTail;
+		Node* prevTail = m_pTail;
 		m_pTail = m_pTail->m_pPrev;
-		delete PrevTail;
+		delete prevTail;
 		m_pTail->m_pNext = nullptr;
 	}
 }
