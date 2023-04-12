@@ -9,6 +9,7 @@ namespace zzstl
 								. function inside a template class is not a function template
 								. function template require
 								. template class specialization
+								. always reset pointers after delete, otherwise still point to invalid address 
 	*/
 
 	template <typename Type, bool IsDoubly>
