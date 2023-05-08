@@ -32,7 +32,7 @@
     <ClCompile Include="Source\Math\Math.c">
       <Filter>Source\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Test.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
