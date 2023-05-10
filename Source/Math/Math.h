@@ -43,7 +43,7 @@ extern "C"
 	/*Return if P's projection is within segment, if 0.f <= t <= 1.f projection falls within segment 
 	Same approach applies to Ray and Line, for Ray clamp if t < 0.f for Line no clamping needed*/
 	 bool ClosestPointOnSegment(Point p, LineSegment segment, Point* closestPoint);
-	 float DistPointToSegmen(Point p, LineSegment segment);
+	 float SqDistFromPointToSegment(Point p, LineSegment segment);
 
 	/*	Plane defined by:
 			. distance from origin and normal vector

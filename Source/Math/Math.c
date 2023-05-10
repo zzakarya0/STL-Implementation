@@ -64,40 +64,40 @@ inline Vector3* Cross(const Vector3* const v1, const Vector3* const v2)
 	return result;
 }
 
-//bool ClosestPointOnSegment(Point p, LineSegment segment, Point* closestPoint)
-//{
-//	Point* A = segment.start, *B = segment.end;
-//	Vector3 AP = { p.x - A->x, p.y - A->y, p.z - A->z };
-//	Vector3 AB = { B->x - A->x, B->y - A->y, B->z - A->z };
-//
-//	float t = Dot(AP, AB) / Dot(AB, AB);
-//
-//	bool isWithinSegment = 0.f - EPSILON <= t && t <= 1.f + EPSILON;
-//	if (t < 0.f) t = 0.f;
-//	else if (1.f < t) t = 1.f;
-//	
-//	*closestPoint = (Point) { .x = A->x + t * AB.x, .y = A->y + t * AB.y, .z = A->z + t * AB.z };
-//	return  isWithinSegment;
-//}
-//
-//float SqDistPointToSegment(Point p, LineSegment segment)
-//{
-//	Point* A = segment.start, * B = segment.end;
-//	Vector3 AP = { p.x - A->x, p.y - A->y, p.z - A->z };
-//	Vector3 AB = { B->x - A->x, B->y - A->y, B->z - A->z };
-//
-//	float t = Dot(AP, AB);
-//	if (t < 0.f) return Dot(AP, AP);
-//
-//	float denom = Dot(AB, AB);
-//	if (t >= denom + EPSILON) 
-//	{
-//		Vector3 BP = { p.x - B->x, p.y - B->y, p.z - B->z };
-//		return Dot(BP, BP);
-//	}
-//
-//	return Dot(AP, AP) - (t * t / denom * denom);
-//}
+bool ClosestPointOnSegment(Point p, LineSegment segment, Point* closestPoint)
+{
+	Point* A = segment.start, *B = segment.end;
+	Vector3 AP = { p.x - A->x, p.y - A->y, p.z - A->z };
+	Vector3 AB = { B->x - A->x, B->y - A->y, B->z - A->z };
+
+	float t = Dot(AP, AB) / Dot(AB, AB);
+
+	bool isWithinSegment = 0.f - EPSILON <= t && t <= 1.f + EPSILON;
+	if (t < 0.f) t = 0.f;
+	else if (1.f < t) t = 1.f;
+	
+	*closestPoint = (Point) { .x = A->x + t * AB.x, .y = A->y + t * AB.y, .z = A->z + t * AB.z };
+	return  isWithinSegment;
+}
+
+float SqDistFromPointToSegment(Point p, LineSegment segment)
+{
+	Point* A = segment.start, * B = segment.end;
+	Vector3 AP = { p.x - A->x, p.y - A->y, p.z - A->z };
+	Vector3 AB = { B->x - A->x, B->y - A->y, B->z - A->z };
+
+	float t = Dot(AP, AB);
+	if (t < 0.f) return Dot(AP, AP);
+
+	float denom = Dot(AB, AB);
+	if (t >= denom + EPSILON) 
+	{
+		Vector3 BP = { p.x - B->x, p.y - B->y, p.z - B->z };
+		return Dot(BP, BP);
+	}
+
+	return Dot(AP, AP) - (t * t / denom) ;
+}
 
 void NormalizePlane(Plane* plane)
 {
