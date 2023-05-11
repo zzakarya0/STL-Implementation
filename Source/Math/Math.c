@@ -14,6 +14,22 @@ bool SameSign(float a, float b)
 	return flag < 0;
 }
 
+Vector3* CreateVector3(float x, float y, float z)
+{
+	Vector3* vector = malloc(sizeof(Vector3));
+
+	*vector = (Vector3){ .x = x, .y = y, .z = z, .sqMagnitude = x * x + y * y + z * z };
+	return vector;
+}
+
+LineSegment* CreateLineSegment(const Point* const start, const Point* const end)
+{
+	LineSegment* segment = malloc(sizeof(LineSegment));
+
+	*segment = (LineSegment){ .start = start, .end = end, .direction = CreateVector3(end->x - start->x, end->y - start->y, end->z - start->z) };
+	return segment;
+}
+
 void PrintPoint(Point p)
 { 
 	printf("Point(%f, %f, %f)\n", p.x, p.y, p.z); 
@@ -21,7 +37,34 @@ void PrintPoint(Point p)
 
 void PrintVector(const Vector3 v)
 {
-	printf("Vector(%f, %f, %f) with magnitude = %f\n", v.x, v.y, v.z, v.sqMagnitude);
+	printf("Vector(%f, %f, %f) with sqMagnitude = %f\n", v.x, v.y, v.z, v.sqMagnitude);
+}
+
+float Cross2D(const Vector3* const v1, const Vector3* const v2)
+{
+	return v1->x * v2->y - v2->x * v1->y;
+}
+
+uint8_t PointSideLine2D(Point* p, LineSegment* segment)
+{
+	Vector3* lineToPoint = CreateVector3(p->x - segment->start->x, p->y - segment->start->y, p->z - segment->start->z);
+
+	float crossRes = Cross2D(segment->direction, lineToPoint);
+
+	if (0 < crossRes) return 0;
+	else if (crossRes < 0) return 1;
+	return 2;
+}
+
+uint8_t CheckVectors(Vector3* A, Vector3* B)
+{
+	if (Dot(*A, *B) == 0) return 0;
+	
+	Vector3* AxB = Cross(A, B);
+	float sqArea = SqMagnitude(*AxB);
+	if (-EPSILON <= sqArea && sqArea <= EPSILON) return 1;
+
+	return 2;
 }
 
 void Normalize(Vector3* const v)
@@ -54,9 +97,9 @@ inline float Dot(const Vector3 v1, const Vector3 v2)
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
-inline Vector3* Cross(const Vector3* const v1, const Vector3* const v2)
+Vector3* Cross(const Vector3* const v1, const Vector3* const v2)
 {
-	Vector3* result = (Vector3*) malloc(sizeof(Vector3));
+	Vector3* result = malloc(sizeof(Vector3));
 
 	result->x = v1->y * v2->z - v2->y * v1->z;
 	result->y = -(v1->x * v2->z - v2->x * v1->z);
@@ -64,7 +107,7 @@ inline Vector3* Cross(const Vector3* const v1, const Vector3* const v2)
 	return result;
 }
 
-bool ClosestPointOnSegment(Point p, LineSegment segment, Point* closestPoint)
+bool ClosestPointOnSegmentToPoint(Point p, LineSegment segment, Point* closestPoint)
 {
 	Point* A = segment.start, *B = segment.end;
 	Vector3 AP = { p.x - A->x, p.y - A->y, p.z - A->z };
