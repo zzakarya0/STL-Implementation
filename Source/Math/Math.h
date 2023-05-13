@@ -21,6 +21,7 @@ extern "C"
 		float x, y, z;
 	} Point;
 	void PrintPoint(Point p);
+	float GetSqDist(const Point* const A, const Point* const B);
 
 
 	typedef struct Vector3
@@ -34,6 +35,7 @@ extern "C"
 	void Normalize(Vector3* const v);
 	bool IsNormalized(const Vector3 v);
 	float SqMagnitude(const Vector3 v);
+	// P: vector from projecting A over B. Dot(A,B) = |P| * |B| 
 	float Dot(const Vector3 v1, const Vector3 v2);
 	Vector3* Cross(const Vector3* const v1, const Vector3* const v2);
 	float Cross2D(const Vector3* const v1, const Vector3* const v2);
@@ -62,7 +64,6 @@ extern "C"
 			. distance from origin and normal vector
 			or 3 non-colinear points
 			or normal and point on plane
-
 			Ax + By + Cz - d = 0
 	*/
 	typedef struct Plane
@@ -79,22 +80,32 @@ extern "C"
 	float DistPointToPlane(Point p, Plane plane);
 
 
-	/*	Axis Aligned Bounding Box defined by
-		min and max points in each axis	 [x, y, z]
+	/*	Axis Aligned Bounding Box defined by:
+			+ min and max points					
+			. min point + diameter for each axis
+			. center point + radius for each axis	(Most efficient space/memory wise)
 
-		Y-axis	^		.---------------.
-				|		|				|
-				|		|				|
-				|		.---------------.
-				0-----------------------------> X-axis
+		Notes:
+			.Before testing for overlap convert into same coord system either world space or local space of other AABB 
 	*/
 	typedef struct AABB
 	{
-		float minPoints[3];
-		float maxPoints[3];
+		Point* min;
+		Point* max;
 	}AABB;
+	// 1 if intersect, 0 otherwise
+	bool AABBIntersect(AABB* box1, AABB* box2);
 	void ClosestPointInAABBToPoint(Point* p, AABB* box, Point* closestPoint);
 	float SqDistFromPointToAABB(Point* p, AABB* box);
+
+
+	typedef struct Sphere
+	{
+		Point* center;
+		float r;
+	}Sphere;
+	// 1 if intersect, 0 otherwise
+	bool SphereIntersect(Sphere* A, Sphere* B);
 
 #ifdef __cplusplus
 } // extern "C"

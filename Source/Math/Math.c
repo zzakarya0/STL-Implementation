@@ -67,6 +67,14 @@ uint8_t CheckVectors(Vector3* A, Vector3* B)
 	return 2;
 }
 
+float GetSqDist(const Point* const A, const Point* const B)
+{
+	float x = A->x - B->x;
+	float y = A->y - B->y;
+	float z = A->z - B->z;
+	return x * x + y * y + z * z;
+}
+
 void Normalize(Vector3* const v)
 {
 	float sqMagnitude = SqMagnitude(*v);
@@ -185,36 +193,51 @@ float DistPointToPlane(Point p, Plane plane)
 	return Dot(*n, qp);
 }
 
+bool AABBIntersect(AABB* A, AABB* B)
+{
+	Point* minA = A->min, * maxA = A->max;
+	Point* minB = B->min, * maxB = B->max;
+
+	if (maxA->x < minB->x || maxB->x < minA->x) return 0;
+	if (maxA->y < minB->y || maxB->y < minA->y) return 0;
+	if (maxA->z < minB->z || maxB->z < minA->z) return 0;
+
+	return 1;
+}
+
 void ClosestPointInAABBToPoint(Point* p, AABB* box, Point* closestPoint)
 {
+	Point* min = box->min, * max = box->max;
+
 	// Get X component
-	closestPoint->x = fmax(p->x, box->minPoints[0]);
-	closestPoint->x = fmin(closestPoint->x, box->maxPoints[0]);
+	closestPoint->x = fmax(p->x, min->x);
+	closestPoint->x = fmin(closestPoint->x, max->x);
 	// Get Y component
-	closestPoint->y = fmax(p->y, box->minPoints[1]);
-	closestPoint->y = fmin(closestPoint->y, box->maxPoints[1]);
+	closestPoint->y = fmax(p->y, min->y);
+	closestPoint->y = fmin(closestPoint->y, max->y);
 	// Get Z component
-	closestPoint->z = fmax(p->z, box->minPoints[2]);
-	closestPoint->z = fmin(closestPoint->z, box->maxPoints[2]);
+	closestPoint->z = fmax(p->z, min->z);
+	closestPoint->z = fmin(closestPoint->z, max->z);
 
 	if (DEBUG) printf("closest point: (%f, %f, %f)\n", closestPoint->x, closestPoint->y, closestPoint->z);
 }
 
 float SqDistFromPointToAABB(Point* p, AABB* box)
 {
+	Point* min = box->min, * max = box->max;
 	float sqDist = 0.f;
 
 	float x = p->x;
-	if (x < box->minPoints[0]) sqDist += (x - box->minPoints[0]) * (x - box->minPoints[0]);
-	else if (box->maxPoints[0] < x) sqDist += (x - box->maxPoints[0]) * (x - box->maxPoints[0]);
+	if (x < min->x) sqDist += (x - min->x) * (x - min->x);
+	else if (max->x < x) sqDist += (x - max->x) * (x - max->x);
 
 	float y = p->y;
-	if (y < box->minPoints[1]) sqDist += (y - box->minPoints[1]) * (y - box->minPoints[1]);
-	else if (box->maxPoints[1] < y) sqDist += (y - box->maxPoints[1]) * (y - box->maxPoints[1]);
+	if (y < min->y) sqDist += (y - min->y) * (y - min->y);
+	else if (max->y < y) sqDist += (y - max->y) * (y - max->y);
 
 	float z = p->z;
-	if (z < box->minPoints[2]) sqDist += (z - box->minPoints[2]) * (z - box->minPoints[2]);
-	else if (box->maxPoints[2] < z) sqDist += (z - box->maxPoints[2]) * (z - box->maxPoints[2]);
+	if (z < min->z) sqDist += (z - min->z) * (z - min->z);
+	else if (max->z < z) sqDist += (z - max->z) * (z - max->z);
 
 	if (DEBUG) {
 		Point Q;
@@ -222,4 +245,13 @@ float SqDistFromPointToAABB(Point* p, AABB* box)
 		printf("SqDist between (%f, %f, %f) and (%f, %f, %f) = %f\n", x, y, z, Q.x, Q.y, Q.z, sqDist);
 	}
 	return sqDist;
+}
+
+bool SphereIntersect(Sphere* A, Sphere* B)
+{
+	Point* aCenter = A->center, *bCenter = B->center;
+	float sqDist = GetSqDist(aCenter, bCenter);
+
+	float radii = A->r + B->r;
+	return sqDist <= radii * radii;
 }
