@@ -1,41 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Source">
       <UniqueIdentifier>{c62b1270-bc75-471f-b59a-17c25c3da5b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Source\Core">
       <UniqueIdentifier>{b4ffcdd5-e0aa-4bbe-8c38-4d8f285439a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Math">
+      <UniqueIdentifier>{985fedd7-5691-48d4-b5da-d037cd17569a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Iterators.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector.h">
+    <ClInclude Include="Source\Core\Array.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Array.h">
+    <ClInclude Include="Source\Core\List.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Utility.h">
+    <ClInclude Include="Source\Core\Utility.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="List.h">
+    <ClInclude Include="Source\Core\Vector.h">
       <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Math.h">
+      <Filter>Source\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp">
-      <Filter>Source\Source Files</Filter>
+    <ClCompile Include="Source\Math\Math.c">
+      <Filter>Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

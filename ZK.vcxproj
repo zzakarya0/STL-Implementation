@@ -140,14 +140,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Array.h" />
-    <ClInclude Include="Iterators.h" />
-    <ClInclude Include="List.h" />
-    <ClInclude Include="Vector.h" />
-    <ClInclude Include="Utility.h" />
+    <ClInclude Include="Source\Core\Array.h" />
+    <ClInclude Include="Source\Core\List.h" />
+    <ClInclude Include="Source\Core\Utility.h" />
+    <ClInclude Include="Source\Core\Vector.h" />
+    <ClInclude Include="Source\Math\Math.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Source\Math\Math.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
