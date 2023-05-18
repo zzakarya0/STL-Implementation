@@ -13,35 +13,16 @@ extern "C"
 {
 #endif
 
-	bool SameSign(float a, float b);
-
-
 	typedef struct Point
 	{
 		float x, y, z;
 	} Point;
-	void PrintPoint(Point p);
-	float GetSqDist(const Point* const A, const Point* const B);
-
 
 	typedef struct Vector3
 	{
 		float x, y, z;
 		float sqMagnitude;
 	} Vector3;
-	// Ctor for Vector
-	Vector3* CreateVector3(float x, float y, float z);
-	void PrintVector(const Vector3 v);
-	void Normalize(Vector3* const v);
-	bool IsNormalized(const Vector3 v);
-	float SqMagnitude(const Vector3 v);
-	// P: vector from projecting A over B. Dot(A,B) = |P| * |B| 
-	float Dot(const Vector3 v1, const Vector3 v2);
-	Vector3* Cross(const Vector3* const v1, const Vector3* const v2);
-	float Cross2D(const Vector3* const v1, const Vector3* const v2);
-	// Return 0: Perpandicular, 1: Parallel/Collinear, 2: Otherwise
-	uint8_t CheckVectors(Vector3* A, Vector3* B);
-
 
 	typedef struct LineSegment
 	{
@@ -49,16 +30,6 @@ extern "C"
 		Point* end;
 		Vector3* direction;
 	} LineSegment;
-	// Ctor for line segment
-	LineSegment* CreateLineSegment(const Point* const start, const Point* const end);
-	// Return 0: point on left, 1: point on right. Note: relative to line directiont in RHCS
-	uint8_t PointSideLine2D(Point* p, LineSegment* segment);
-	/*Return if P's projection is within segment, if 0.f <= t <= 1.f projection falls within segment 
-	Same approach applies to Ray and Line, for Ray clamp if t < 0.f for Line no clamping needed*/
-	bool ClosestPointOnSegmentToPoint(Point p, LineSegment segment, Point* closestPoint);
-	// Projecting P over AB, Dist = Dot(AB, AP) / Magnitude(AB)
-	float SqDistFromPointToSegment(Point p, LineSegment segment);
-
 
 	/*	Plane defined by:
 			. distance from origin and normal vector
@@ -71,14 +42,6 @@ extern "C"
 		float d;
 		Vector3* normal;
 	} Plane;
-	void NormalizePlane(Plane* plane);
-	// Normalizing P so it isn't scalled by plane normal
-	void GetPointOnPlane(Plane plane, Point* p);
-	// Project P over plane normal to get t distance btwn P and Plane, closestPoint = P - t * n 
-	void ClosestPointOnPlaneToPoint(Point p, Plane plane, Point* closestPoint);
-	// Project P over plane normal
-	float DistPointToPlane(Point p, Plane plane);
-
 
 	/*	Axis Aligned Bounding Box defined by:
 			+ min and max points					
@@ -93,19 +56,78 @@ extern "C"
 		Point* min;
 		Point* max;
 	}AABB;
-	// 1 if intersect, 0 otherwise
-	bool AABBIntersect(AABB* box1, AABB* box2);
-	void ClosestPointInAABBToPoint(Point* p, AABB* box, Point* closestPoint);
-	float SqDistFromPointToAABB(Point* p, AABB* box);
-
 
 	typedef struct Sphere
 	{
 		Point* center;
 		float r;
 	}Sphere;
-	// 1 if intersect, 0 otherwise
+
+	typedef struct Triangle
+	{
+		Point* a, * b, * c;
+	}Triangle;
+
+
+	//////////////////// Struct Ctors //////////////////// 
+	Vector3* CreateVector3(float x, float y, float z);
+	Vector3* CreateVector3FromPoints(Point* from, Point* to);
+	Plane* CreatePlane(const Point* const p1, const Point* const p2, const Point* const p3);
+	LineSegment* CreateLineSegment(const Point* const start, const Point* const end);
+	Triangle* CreateTriangle(const Point* const a, const Point* const b, const Point* const c);
+
+
+	//////////////////// Utility functions ////////////////////
+	void PrintPoint(Point p);
+	void PrintVector(const Vector3 v);
+	void PrintPlane(const Plane* const plane);
+
+	void Normalize(Vector3* const v);
+	void NormalizePlane(Plane* plane);
+	bool IsNormalized(const Vector3 v);
+	//Barycentric Coord: P = A + v AB + w AC. If P within triangle ABC: 0 <= 1 - v - w  [0 <= v,w <= 1.f] 
+	bool IsPointInTriangle(Point* p, Triangle* abc, float* v, float* w);
+	//Return 0: Perpandicular, 1: Parallel/Collinear, 2: Otherwise
+	uint8_t CheckVectors(Vector3* A, Vector3* B);
+	//P: vector from projecting A over B. Dot(A,B) = |P| * |B|
+	float Dot(const Vector3 v1, const Vector3 v2);
+	Vector3* Cross(const Vector3* const v1, const Vector3* const v2);
+	float SqDist(const Point* const A, const Point* const B);
+	float SqMagnitude(const Vector3 v);
+	//Projecting P over AB, Dist = Dot(AB, AP) / Magnitude(AB)
+	float SqDistFromPointToSegment(Point p, LineSegment segment);
+	float SqDistFromPointToAABB(Point* p, AABB* box);
+	//Project P over plane normal
+	float DistPointToPlane(Point p, Plane plane);
+
+	//Check if a and b have same sign
+	bool SameSign(float a, float b);
+
+	/*float Cross2D(const Vector3* const v1, const Vector3* const v2);*/
+	// Return 0: point on left, 1: point on right. Note: relative to line directiont in RHCS
+	//uint8_t PointSideLine2D(Point* p, LineSegment* segment);
+
+
+	//////////////////// Primitive intersection test ////////////////////
+	//Return 1: Intersect, 0 otherwise
 	bool SphereIntersect(Sphere* A, Sphere* B);
+	//Return 1: Intersect, 0 otherwise
+	bool AABBIntersect(AABB* box1, AABB* box2);
+
+
+	//////////////////// Closest point tests ////////////////////
+	//Make sure plane is normalized, P = (0,0,0) + plane.normal * plane.d
+	void GetPointOnPlane(Plane plane, Point* p);
+	/*Return if P's projection is within segment, if 0.f <= t <= 1.f projection falls within segment
+	Same approach applies to Ray and Line, for Ray clamp if t < 0.f for Line no clamping needed*/
+	bool ClosestPointOnSegmentToPoint(Point p, LineSegment segment, Point* closestPoint);
+	//Project P over plane normal to get t distance btwn P and Plane, closestPoint = P - t * n
+	void ClosestPointOnPlaneToPoint(Point p, Plane plane, Point* closestPoint);
+	void ClosestPointInAABBToPoint(Point* p, AABB* box, Point* closestPoint);
+	/*Project P over plane spawned by triangle, check if projection lies within triangle (Barycentric Coord)
+	if yes then point found. Else Project P over all triangle segments and take closest one to P.*/
+	void ClosestPointInTriangleToPoint(Point* p, Triangle* abc, Point* closestPoint);
+
 
 #ifdef __cplusplus
 } // extern "C"
