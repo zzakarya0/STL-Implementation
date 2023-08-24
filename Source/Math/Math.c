@@ -15,6 +15,16 @@ bool SameSign(float a, float b)
 	return flag < 0;
 }
 
+inline void SetBit(uint8_t bit, int32_t n) { n |= (1 << bit); }
+inline void ClearBit(uint8_t bit, int32_t n) { n &= ~(1 << bit); }
+inline void FlipBit(uint8_t bit, int32_t n) { n ^= (1 << bit); }
+inline uint8_t CheckBit(uint8_t bit, int32_t n) { return (n >> bit) & 1; }
+inline bool CheckMask(uint32_t mask, int32_t n) { return (n & mask) == mask; }
+inline bool HasAnyFlags(int32_t flags, int32_t n) { return flags & n; }
+inline bool HasAllFlagsSet(int32_t flags, int32_t n) { return (flags & n) == flags; }
+inline int32_t EnableFlags(int32_t startingFlags, int32_t flagsToEnable) { return startingFlags | flagsToEnable; }
+inline int32_t DisableFlags(int32_t startingFlags, int32_t flagsToDisable) { return startingFlags & (~flagsToDisable); }
+
 Vector3* CreateVector3(float x, float y, float z)
 {
 	Vector3* vector = malloc(sizeof(Vector3));
@@ -29,6 +39,14 @@ LineSegment* CreateLineSegment(const Point* const start, const Point* const end)
 
 	*segment = (LineSegment){ .start = start, .end = end, .direction = CreateVector3(end->x - start->x, end->y - start->y, end->z - start->z) };
 	return segment;
+}
+
+Sphere* CreateSphere(const Point* const center, float radius)
+{
+	Sphere* s = malloc(sizeof(Sphere));
+
+	*s = (Sphere){ .center = center, .r = radius };
+	return s;
 }
 
 void PrintPoint(Point p)
@@ -364,4 +382,112 @@ void ClosestPointInTriangleToPoint(Point* p, Triangle* abc, Point* closestPoint)
 	free(AB); 
 	free(BC); 
 	free(CA);
+	free(trianglePlane);
+}
+
+void ClosestPointsOf2Lines(const LineSegment* const lineA, const LineSegment* const lineB, Point* pA, Point* pB)
+{
+	//v = pA - pB
+	//Dot(v, DirA) = 0	--> ((startA + x DirA) - (startB + y DirB)) . DirA = 0
+	//Dot(v, DirB) = 0	--> ((startA + x DirA) - (startB + y DirB)) . DirB = 0
+
+	const LineSegment* const BA = CreateLineSegment(lineB->start, lineA->start);
+	Vector3* dirA = lineA->direction, * dirB = lineB->direction, *dir = BA->direction;
+
+	float dAA = Dot(*dirA, *dirA), dAB = Dot(*dirA, *dirB), dBB = Dot(*dirB, *dirB);
+	float dA = Dot(*dir, *dirA), dB = Dot(*dir, *dirB);
+
+	float cramer = dAA * dBB - (dAB * dAB);
+	assert(cramer != 0);
+
+	float x = (-dA * dBB + (dB * dAB)) / cramer, y = (dAA * dB - (dA * dAB)) / cramer;
+
+	Point* startA = lineA->start;
+	*pA = (Point){ .x = startA->x + x * dirA->x, .y = startA->y + x * dirA->y, .z = startA->z + x * dirA->z};
+
+	Point* startB = lineB->start;
+	*pB = (Point){ .x = startB->x + y * dirB->x, .y = startB->y + y * dirB->y, .z = startB->z + y * dirB->z };
+
+	free(BA);
+}
+
+//bool ClosestPointsOf2LineSegments(const LineSegment* const lineA, const LineSegment* const lineB, Point* pA, Point* pB)
+//{
+//	const LineSegment* const BA = CreateLineSegment(lineB->start, lineA->start);
+//	Vector3* dirA = lineA->direction, * dirB = lineB->direction, * dir = BA->direction;
+//
+//	float dAA = Dot(*dirA, *dirA), dAB = Dot(*dirA, *dirB), dBB = Dot(*dirB, *dirB);
+//	float dA = Dot(*dir, *dirA), dB = Dot(*dir, *dirB);
+//
+//	float cramer = dAA * dBB - (dAB * dAB);
+//	assert(cramer != 0);
+//
+//	float x = (-dA * dBB + (dB * dAB)) / cramer, y = (dAA * dB - (dA * dAB)) / cramer;
+//
+//	bool withinSegments = false;
+//	if (-EPSILON <= x && x <= 1.f + EPSILON && -EPSILON <= y && y <= 1.f + EPSILON) withinSegments = true;
+//	
+//	else {
+//		if (EPSILON >= x || x >= 1.f + EPSILON) x = x <= EPSILON ? 0 : 1.f;
+//		if (EPSILON >= y || y >= 1.f + EPSILON) y = y <= EPSILON ? 0 : 1.f;
+//	}
+//
+//	Point* startA = lineA->start;
+//	*pA = (Point){ .x = startA->x + x * dirA->x, .y = startA->y + x * dirA->y, .z = startA->z + x * dirA->z };
+//
+//	Point* startB = lineB->start;
+//	*pB = (Point){ .x = startB->x + y * dirB->x, .y = startB->y + y * dirB->y, .z = startB->z + y * dirB->z };
+//
+//	free(BA);
+//	return withinSegments;
+//}
+
+bool SphereIntersectPlane(const Sphere* const s, Plane* const p)
+{
+	Vector3* n = p->normal;
+	if (!IsNormalized(*n)) NormalizePlane(p);
+
+	float dist = DistPointToPlane(*s->center, *p);
+	return fabs(dist) <= s->r;
+}
+
+bool OBBIntersectPlane(OBB box, Plane p)
+{
+	//Project OBB furthest vertex  onto plane.n
+	Point center = { box.center.x, box.center.y, box.center.z};
+	Point e0 = { box.u[0].x * box.e.x, box.u[0].y * box.e.x, box.u[0].z * box.e.x };
+	Point e1 = { box.u[1].x * box.e.y, box.u[1].y * box.e.y, box.u[1].z * box.e.y };
+	Point e2 = { box.u[2].x * box.e.z, box.u[2].y * box.e.z, box.u[2].z * box.e.z };
+
+	Point vertex = { center.x + e0.x + e1.x + e2.x, center.y + e0.y + e1.y + e2.y, center.z + e0.z + e1.z + e2.z };
+	Vector3 centerToVertex = { vertex.x - center.x, vertex.y - center.y, vertex.z - center.z };
+
+	Vector3* n = p.normal;
+	if (!IsNormalized(*n)) NormalizePlane(&p);
+	float vertexCenterDst = fabsf(Dot(centerToVertex, *n));
+
+	//Project OBB.center over n
+	Point Q;
+	GetPointOnPlane(p, &Q);
+	Vector3* QC = CreateVector3FromPoints(&Q, &center);
+	float centerPlaneDst = Dot(*QC, *n);
+
+	return fabsf(centerPlaneDst) <= vertexCenterDst;
+}
+
+bool AABBIntersectPlane(AABB box, Plane p)
+{
+	Point center = { (box.min->x + box.max->x) / 2, (box.min->y + box.max->y) / 2, (box.min->z + box.max->z) / 2 };
+	Vector3 centerToVertex = { box.max->x - center.x, box.max->y - center.y, box.max->z - center.z };
+
+	Vector3* n = p.normal;
+	if (!IsNormalized(*n)) NormalizePlane(&p);
+	float vertexCenterDst = fabsf(Dot(centerToVertex, *n));
+
+	Point Q;
+	GetPointOnPlane(p, &Q);
+	Vector3* QC = CreateVector3FromPoints(&Q, &center);
+	float centerPlaneDst = Dot(*QC, *n);
+
+	return fabsf(centerPlaneDst) <= vertexCenterDst;
 }

@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #define DEBUG 0
-#define EPSILON 0.0001
+#define EPSILON 0.0001f
 #ifdef __cplusplus
 extern "C"
 {
@@ -24,6 +24,11 @@ extern "C"
 		float sqMagnitude;
 	} Vector3;
 
+	/*
+		Also used to represent lines and rays
+		2D: either parallel/collinear or interesecting
+		2D < : parallel/collinear or intersecting or skew
+	*/
 	typedef struct LineSegment
 	{
 		Point* start;
@@ -57,6 +62,17 @@ extern "C"
 		Point* max;
 	}AABB;
 
+	typedef struct OBB
+	{
+		Point center;	//center of OBB
+		Vector3 u[3];	//local x,y,z axes
+		Vector3 e;		//positive halfwidth extends of OBB along each axis
+	}OBB;
+
+	/*	Sphere equation: (x - a)^2 + (y - b)^2 + (c - z)^2 = r^2
+	*		center = (a,b,c)
+	*		radius = r
+	*/
 	typedef struct Sphere
 	{
 		Point* center;
@@ -75,7 +91,7 @@ extern "C"
 	Plane* CreatePlane(const Point* const p1, const Point* const p2, const Point* const p3);
 	LineSegment* CreateLineSegment(const Point* const start, const Point* const end);
 	Triangle* CreateTriangle(const Point* const a, const Point* const b, const Point* const c);
-
+	Sphere* CreateSphere(const Point* const center, float radius);
 
 	//////////////////// Utility functions ////////////////////
 	void PrintPoint(Point p);
@@ -127,6 +143,19 @@ extern "C"
 	/*Project P over plane spawned by triangle, check if projection lies within triangle (Barycentric Coord)
 	if yes then point found. Else Project P over all triangle segments and take closest one to P.*/
 	void ClosestPointInTriangleToPoint(Point* p, Triangle* abc, Point* closestPoint);
+	void ClosestPointsOf2Lines(const LineSegment* const lineA, const LineSegment* const lineB, Point* pA, Point* pB);
+	//Intuuitive approach of going with closest point on lines then clipping to line segments is wrong
+	//bool ClosestPointsOf2LineSegments(const LineSegment* const lineA, const LineSegment* const lineB, Point* pA, Point* pB);
+
+
+	//////////////////// Testing primitives ////////////////////
+	//Project sphere's center over plane normal to get distance between plane-sphere, then compare to sphere radius
+	bool SphereIntersectPlane(const Sphere* const s, const Plane* const p);
+	//Note: AABB/OBB extent is from center to vertex not the vertex
+	//Consider L(t) = OBB.center + t * plane.n (line starting at C and going in same direction as plane normal), project one of furthest OBB vertices onto L(t) (onto n) to get distance
+	//between C and that vertex (call it r). Project OBB.center onto n to get dst between center and plane (call it s) comapre s and r
+	bool OBBIntersectPlane(OBB box, Plane p);
+	bool AABBIntersectPlane(AABB box, Plane p);
 
 
 #ifdef __cplusplus
